@@ -1,0 +1,14 @@
+{
+  "name": "Freight Profit Engine",
+  "short_name": "Freight Profit",
+  "description": "See what a load really pays after fuel, wear, deadhead, time and taxes.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#020611",
+  "theme_color": "#020611",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ]
+}

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#020611">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Freight Profit">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Freight Profit Engine - Signal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#020611;--card:rgba(8,22,52,.62);--in:rgba(2,8,28,.55);--bd:rgba(130,195,255,.25);--tx:#e6f1ff;--mu:#8fb0d8;--ac:#4aa8ff;--ok:#5ff0c0;--wa:#ffb454;--bad:#ff7a8a;--pu:#a9c4ff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Jost','Helvetica Neue',-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+body{background:linear-gradient(180deg,#020611 0%,#06173a 60%,#020611 100%);background-color:#020611;background-attachment:fixed;color:var(--tx);padding:14px;line-height:1.4;font-weight:300}
+.wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+h1{font-size:1.25rem}h2{font-size:1rem;margin-bottom:4px}
+.sub,.mu{color:var(--mu);font-size:.8rem}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:16px;backdrop-filter:blur(8px);box-shadow:0 10px 40px rgba(0,10,40,.5),inset 0 1px 0 rgba(180,220,255,.12)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+label{display:block;font-size:.7rem;text-transform:uppercase;letter-spacing:.16em;font-weight:400;color:var(--mu);margin-bottom:3px}
+input,select{width:100%;background:var(--in);border:1px solid var(--bd);color:var(--tx);border-radius:8px;padding:9px 10px;font-size:1rem}
+input:focus{outline:2px solid var(--ac);border-color:transparent}
+.f{margin-bottom:10px}
+.stat{background:var(--in);border:1px solid var(--bd);border-radius:14px;padding:11px}
+.stat b{display:block;font-size:1.25rem;font-weight:300}.stat small{color:var(--mu);font-size:.72rem}
+.big b{font-size:2.4rem;font-weight:200;text-shadow:0 0 24px rgba(95,240,192,.45)}
+.bar{height:10px;background:var(--in);border-radius:99px;overflow:hidden;margin:5px 0 10px}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#0b3a8c,#4aa8ff,#cfe9ff);box-shadow:0 0 12px #4aa8ff;transition:width .3s}
+.btn{background:linear-gradient(90deg,rgba(11,58,140,.9),rgba(74,168,255,.55));color:#fff;border:1px solid rgba(180,225,255,.5);font-weight:400;border-radius:99px;padding:13px 14px;font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;box-shadow:0 0 22px rgba(74,168,255,.35);cursor:pointer;width:100%}
+.btn.s{width:auto;padding:7px 12px;font-size:.8rem;letter-spacing:.06em;text-transform:none;box-shadow:none}
+.btn.g{background:transparent;color:var(--mu);border:1px solid var(--bd);box-shadow:none}
+.ok{color:var(--ok)}.wa{color:var(--wa)}.bad{color:var(--bad)}.pu{color:var(--pu)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.lrow{border-top:1px solid var(--bd);padding:9px 0;font-size:.85rem}.lrow.old{opacity:.5}
+.x{background:none;border:0;color:var(--bad);font-size:1.1rem;cursor:pointer;padding:4px 8px}
+.sc{background:var(--in);border:1px solid var(--bd);border-radius:10px;padding:10px;margin-bottom:8px}
+summary{cursor:pointer;font-weight:600;font-size:.9rem}
+.seg{display:flex;gap:6px}.seg button{flex:1;padding:9px;border-radius:99px;border:1px solid var(--bd);background:var(--in);color:var(--mu);font-weight:400;letter-spacing:.14em;cursor:pointer}.seg button.on{background:linear-gradient(90deg,#0b3a8c,#4aa8ff);color:#fff;border-color:transparent}
+.hero{width:100%;max-width:460px;height:auto;display:block;margin:0 auto}html{font-size:18px}body{font-weight:400;padding-bottom:96px}.card{background:rgba(6,18,44,.84)}label{color:#b4cdee;font-size:.78rem}.sub,.mu{color:#b4cdee;font-size:.88rem}.stat b{font-weight:500}.big b{font-weight:300}
+#aMiles{font-size:1.7rem;font-weight:500;padding:14px 8px;border:2px solid var(--ac)}.f{min-width:0}
+.fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:50;width:auto;padding:14px 26px;font-size:.85rem;box-shadow:0 0 26px rgba(74,168,255,.7),0 6px 24px rgba(0,0,0,.6)}
+.lg{display:inline-flex;width:32px;height:32px;border-radius:8px;align-items:center;justify-content:center;background:linear-gradient(135deg,#0b3a8c,#4aa8ff);color:#fff;font-weight:500;margin-right:12px}
+.beam{animation:bm 3.8s ease-in-out infinite}@keyframes bm{0%,100%{opacity:1}50%{opacity:.5}}
+.pgl{animation:pg 3.8s ease-in-out infinite}@keyframes pg{50%{opacity:.8}}
+.eyes{transform-box:fill-box;transform-origin:center;animation:blink 5.5s infinite}@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.07)}}
+.bub{transform-box:fill-box;transform-origin:center}.bub.play{animation:goA 3.4s ease-out .3s 1 both}
+@keyframes goA{0%{opacity:0;transform:scale(.6)}10%{opacity:1;transform:scale(1.06)}16%{transform:scale(1)}28%{opacity:.35}34%{opacity:1}46%{opacity:.25}52%{opacity:1}82%{opacity:1}100%{opacity:0}}
+:root[data-theme="day"]{--bg:#f3f6fb;--card:#fff;--in:#eaf0f8;--bd:#6f88aa;--tx:#06122a;--mu:#2c4468;--ac:#0b5fd6;--ok:#0b7a4b;--wa:#9a5200;--bad:#b3122b;--pu:#3433b0}
+:root[data-theme="day"] body{background:#f3f6fb;font-weight:500}
+:root[data-theme="day"] .card{background:#fff;box-shadow:0 2px 10px rgba(6,18,42,.18)}
+:root[data-theme="day"] label,:root[data-theme="day"] .sub,:root[data-theme="day"] .mu{color:#2c4468}
+:root[data-theme="day"] .stat b{font-weight:600}:root[data-theme="day"] .big b{text-shadow:none;font-weight:500}
+:root[data-theme="day"] .hero{background:linear-gradient(180deg,#020611,#06173a);border-radius:18px}
+:root[data-theme="day"] .btn{background:linear-gradient(90deg,#0b3a8c,#0b5fd6);border-color:#0b3a8c;box-shadow:0 2px 8px rgba(6,18,42,.3)}
+:root[data-theme="day"] .btn.g{background:transparent;color:#2c4468;border-color:#2c4468;box-shadow:none}
+:root[data-theme="day"] .seg button.on{background:#0b3a8c}
+@media (prefers-reduced-motion:reduce){.beam,.pgl,.eyes,.bub{animation:none}}
+</style></head><body><div class="wrap">
+
+<svg id="heroSvg" class="hero" viewBox="0 0 400 360" role="img" aria-label="Milky Way band and planet glow above a van, front close-up line drawing">
+<defs>
+<radialGradient id="sv-pl" cx=".35" cy=".3" r=".95"><stop offset="0" stop-color="#9fd8ff"/><stop offset=".3" stop-color="#3a8be8"/><stop offset=".68" stop-color="#0d3a8f"/><stop offset="1" stop-color="#020a22"/></radialGradient>
+<radialGradient id="sv-bloom" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#bfe3ff" stop-opacity=".9"/><stop offset="1" stop-color="#4aa8ff" stop-opacity="0"/></radialGradient>
+<radialGradient id="sv-mw" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#cfe9ff" stop-opacity=".32"/><stop offset=".6" stop-color="#4aa8ff" stop-opacity=".1"/><stop offset="1" stop-color="#4aa8ff" stop-opacity="0"/></radialGradient>
+<linearGradient id="sv-ln" gradientUnits="userSpaceOnUse" x1="0" y1="198" x2="0" y2="360"><stop offset="0" stop-color="#cfe9ff"/><stop offset=".6" stop-color="#4aa8ff" stop-opacity=".7"/><stop offset="1" stop-color="#4aa8ff" stop-opacity=".15"/></linearGradient>
+<linearGradient id="sv-gl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9fd4ff" stop-opacity=".4"/><stop offset="1" stop-color="#0b3a8c" stop-opacity=".04"/></linearGradient>
+<linearGradient id="sv-hd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4aa8ff" stop-opacity=".3"/><stop offset="1" stop-color="#020a22" stop-opacity="0"/></linearGradient>
+<linearGradient id="sv-bm" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#e8f5ff"/><stop offset="1" stop-color="#4aa8ff" stop-opacity="0"/></linearGradient>
+<filter id="sv-bl1" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="7"/></filter>
+<filter id="sv-bl2" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="9"/></filter>
+</defs>
+<g filter="url(#sv-bl2)"><ellipse transform="rotate(-43 210 180)" cx="210" cy="180" rx="290" ry="30" fill="url(#sv-mw)"/></g>
+<g fill="#cfe9ff" opacity=".8"><circle cx="28" cy="318" r=".9"/><circle cx="58" cy="326" r="1.1"/><circle cx="95" cy="285" r=".8"/><circle cx="110" cy="250" r="1"/><circle cx="150" cy="240" r=".8"/><circle cx="70" cy="262" r="1.2"/><circle cx="330" cy="70" r="1"/><circle cx="360" cy="95" r=".8"/><circle cx="372" cy="40" r="1.1"/><circle cx="300" cy="28" r=".9"/><circle cx="345" cy="124" r=".8"/><circle cx="392" cy="60" r="1"/><circle cx="318" cy="168" r=".8"/><circle cx="20" cy="220" r=".9"/><circle cx="378" cy="150" r=".8"/></g>
+<polyline points="46,349 69,297 133,273 157,216 222,193 248,128 307,100 337,40 389,18" fill="none" stroke="#9fd0ff" stroke-width=".7" stroke-opacity=".42"/>
+<g fill="#fff"><circle cx="46" cy="349" r="1.8"/><circle cx="69" cy="297" r="1.6"/><circle cx="133" cy="273" r="2"/><circle cx="157" cy="216" r="1.6"/><circle cx="337" cy="40" r="2"/><circle cx="389" cy="18" r="1.8"/></g>
+<circle class="pgl" cx="200" cy="74" r="104" fill="none" stroke="#7cc4ff" stroke-width="8" opacity=".55" filter="url(#sv-bl1)"/>
+<circle cx="200" cy="74" r="100" fill="url(#sv-pl)"/>
+<ellipse cx="200" cy="170" rx="100" ry="18" fill="url(#sv-bloom)" opacity=".5"/>
+<text x="200" y="98" text-anchor="middle" font-family="Jost,'Helvetica Neue',Arial,sans-serif" font-weight="300" font-size="12" letter-spacing="7" fill="#e6f1ff" opacity=".85">FREIGHT</text>
+<text x="200" y="130" text-anchor="middle" font-family="Jost,'Helvetica Neue',Arial,sans-serif" font-weight="200" font-size="31" letter-spacing="7" fill="#fff">PROFIT ENGINE</text>
+<text id="heroSub" x="200" y="150" text-anchor="middle" font-family="Jost,'Helvetica Neue',Arial,sans-serif" font-weight="300" font-size="9" letter-spacing="2.4" fill="#bfe3ff" opacity=".85">WEEK OF OCT 12  ·  THE GOAL: $2,000</text>
+<g class="beam"><ellipse cx="200" cy="176" rx="44" ry="9" fill="url(#sv-bloom)"/><rect x="199.2" y="154" width="1.6" height="22" fill="url(#sv-bm)"/></g>
+<g transform="translate(0,76)" stroke="url(#sv-ln)" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<path d="M106 152 L132 100 L268 100 L294 152 Z" fill="url(#sv-gl)"/>
+<path d="M106 152 L294 152 L322 196 L78 196 Z" fill="url(#sv-hd)"/>
+<path d="M168 152 L156 196 M232 152 L244 196 M78 196 L72 214 L328 214 L322 196" stroke-width="1.6"/>
+<path d="M40 300 C40 236 120 236 120 300 M280 300 C280 236 360 236 360 300"/>
+<path d="M54 300 C54 252 106 252 106 300 M294 300 C294 252 346 252 346 300" stroke-width="6" opacity=".55"/>
+
+
+<ellipse cx="200" cy="124" rx="24" ry="19" fill="url(#sv-bloom)" stroke="none" opacity=".35"/>
+<path d="M200 108 C215 108 224 116 222 126 C220 134 209 139 204 145 L196 145 C191 139 180 134 178 126 C176 116 185 108 200 108 Z" fill="url(#sv-gl)" stroke-width="1.8"/>
+<path d="M183 120 C190 119 197 126 199 133 C191 135 182 128 183 120 Z M217 120 C210 119 203 126 201 133 C209 135 218 128 217 120 Z" fill="#020a22" stroke-width="1.4" class="eyes"/>
+<path d="M197 139 L203 139" stroke-width="1.4"/>
+<path d="M176 151 Q200 143 224 151" stroke-width="2"/>
+</g>
+<g id="goBubble" class="bub" opacity="0"><g fill="#eaf6ff"><circle cx="62" cy="196" r="15"/><circle cx="82" cy="190" r="17"/><circle cx="104" cy="196" r="15"/><circle cx="76" cy="208" r="15"/><circle cx="98" cy="208" r="14"/><circle cx="52" cy="206" r="11"/><circle cx="132" cy="204" r="4"/><circle cx="148" cy="208" r="2.6"/></g><text x="79" y="205" text-anchor="middle" font-family="Jost,'Helvetica Neue',Arial,sans-serif" font-weight="500" font-size="13" fill="#06173a">Let's Go!</text></g>
+</svg>
+<div class="sub" style="text-align:center">What a load really pays after fuel, wear, deadhead, time and taxes.</div>
+<div style="text-align:center;margin-top:8px"><button class="btn s g" id="themeBtn" onclick="toggleTheme()">☀ Day mode</button></div>
+
+<div class="card">
+ <div class="g2"><div><label>Weekly net goal ($)</label><input type="number" id="netGoal" inputmode="decimal"></div>
+ <div><label>Gross target (at your avg margin)</label><div class="stat"><b id="grossGoal">-</b></div></div></div>
+ <details style="margin-top:12px"><summary>Equipment, cost &amp; tax settings</summary>
+  <div class="mu" style="margin:8px 0">Starting-point numbers. Edit them to match your truck. Verify the IRS rate and tax % with your accountant.</div>
+  <div class="g3">
+   <div class="f"><label>Fuel $/gal</label><input type="number" id="fuel" step="0.05" inputmode="decimal"></div>
+   <div class="f"><label>MPG</label><input type="number" id="mpg" step="0.1" inputmode="decimal"></div>
+   <div class="f"><label>Wear $/mi</label><input type="number" id="wear" step="0.01" inputmode="decimal"></div>
+   <div class="f"><label>Avg mph</label><input type="number" id="mph" inputmode="decimal"></div>
+   <div class="f"><label>IRS mileage rate $/mi</label><input type="number" id="mileRate" step="0.005" inputmode="decimal"></div>
+   <div class="f"><label>Income tax % (fed)</label><input type="number" id="incTax" inputmode="decimal"></div>
+   <div class="f"><label>Other fixed costs / week $</label><input type="number" id="fixed" inputmode="decimal"></div>
+   <div class="f"><label>Insurance $/month</label><input type="number" id="ins" inputmode="decimal"></div>
+   <div class="f"><label>Insurance company (optional)</label><input type="text" id="insCo"></div>
+   <div class="f" style="grid-column:1/-1"><label>About my truck &amp; stops (used by Plan my trip)</label><input type="text" id="tripPrefs" placeholder="e.g. Cargo van, can't use drive-thrus"></div>
+  </div>
+  <div class="f" style="margin-top:10px"><label style="display:flex;gap:8px;align-items:center;text-transform:none;letter-spacing:0;font-size:.85rem;color:var(--tx)"><input type="checkbox" id="geo" style="width:auto"> Use location to stamp pickup and drop-off</label><div class="mu">Off by default. When on, tapping a stamp saves only a rough spot (about a 7-mile grid) and the time. It stays on this device.</div></div>
+  <div class="mu" id="fixedNote" style="margin-bottom:6px"></div>
+  <div class="mu">Taxes use only the IRS mileage rate as the deduction (no fuel/wear deduction on top). Fuel and wear still count as real cash out for take-home. SE tax (15.3% on 92.35% of profit) is included and is separate from, and in addition to, federal income tax.</div>
+ </details>
+</div>
+
+<div class="card">
+ <h2>This week</h2><div class="sub" id="wkLabel"></div>
+ <div class="stat big" style="margin:10px 0"><label>Net take-home (accepted loads)</label><b class="ok" id="wNet">$0.00</b><small id="wNetSub"></small></div>
+ <div class="g2">
+  <div class="stat"><label>Gap to goal</label><b class="wa" id="wGap">-</b></div>
+  <div class="stat"><label>Gross</label><b id="wGross">$0</b></div>
+  <div class="stat"><label>Miles</label><b id="wMiles">0</b><small id="wYield"></small></div>
+  <div class="stat"><label>Clock hours</label><b id="wHrs">0</b><small id="wHr"></small></div>
+ </div>
+ <div style="margin-top:12px" class="row"><span class="mu">Net goal progress (accepted + planned)</span><span class="mu" id="pctTxt">0%</span></div>
+ <div class="bar"><i id="pBar"></i></div>
+</div>
+
+<div class="card">
+ <h2>Evaluate a load</h2><div class="sub">Single-run analyzer</div>
+  <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:10px">
+  <div class="f"><label>Trip miles (loaded)</label><input type="number" id="aMiles" inputmode="decimal"><button class="btn s g" id="micBtn" onclick="micMiles()" style="margin-top:6px">🎙 Say miles</button></div>
+  <div class="f"><label>Rate $/mi</label><input type="number" id="aRate" step="0.05" inputmode="decimal"></div>
+  <div class="f"><label>Or flat $</label><input type="number" id="aFlat" inputmode="decimal"></div>
+ </div>
+ <div class="g3">
+  <div class="f"><label>Miles to pickup</label><input type="number" id="aDh" inputmode="decimal"></div>
+  <div class="f"><label>Wait time (min)</label><input type="number" id="extra" step="5" inputmode="decimal"></div>
+  <div class="f"><label>Drive hrs</label><div class="stat" style="padding:9px"><span id="aDrive">0</span></div></div>
+ </div>
+ <div class="mu" id="typeNote" style="margin-bottom:10px"></div>
+ <div class="f"><label>Lane / note (optional)</label><input type="text" id="aNote" placeholder="e.g. LV to Phoenix, pallets"></div>
+ <div class="g2">
+  <div class="stat"><label>Net take-home</label><b class="ok" id="rNet">-</b><small id="rMargin"></small></div>
+  <div class="stat"><label>$/hr on the clock</label><b class="wa" id="rHr">-</b><small id="rHrSub"></small></div>
+  <div class="stat"><label>Cash costs</label><b class="bad" id="rCost">-</b><small id="rCostSub"></small></div>
+  <div class="stat"><label>Est. taxes</label><b class="pu" id="rTax">-</b><small id="rTaxSub"></small></div>
+ </div>
+ <div class="stat" style="margin:10px 0"><span class="mu">Break-even rate (cash costs only): </span><b id="rBE" style="display:inline">-</b></div>
+ <div class="stat" style="margin-bottom:10px"><span class="mu">Reality check: </span><span id="rGoal">-</span></div>
+ <button class="btn" onclick="acceptLoad()">+ Accept &amp; log to weekly totals</button>
+</div>
+
+<div class="card">
+ <div class="row"><h2>Trip log</h2><button class="btn s g" onclick="copyCsv()" id="csvBtn">Copy CSV</button></div>
+ <div class="sub">Every accepted load is saved on this device. After the run, tap Enter actuals to compare what really happened to your estimate. Older weeks are dimmed.</div>
+ <div id="log"></div>
+</div>
+
+<div class="card">
+ <div class="row"><div><h2>What-if combinations</h2><div class="sub">Model loads on top of what you've accepted</div></div><button class="btn s" onclick="addSc()">+ Row</button></div>
+ <div id="scs" style="margin-top:10px"></div>
+ 
+ <div class="g3">
+  <div class="stat"><label>Planned net</label><b class="ok" id="pNet">$0</b></div>
+  <div class="stat"><label>Planned miles</label><b id="pMiles">0</b></div>
+  <div class="stat"><label>Gap left</label><b class="wa" id="pGap">-</b></div>
+ </div>
+ <div class="mu" id="pTot" style="margin-top:10px"></div>
+ <div class="stat" style="margin-top:10px"><label>Rate needed to close the gap with one more load</label>
+  <div class="g2"><input type="number" id="nMiles" placeholder="Loaded mi" inputmode="decimal"><input type="number" id="nDh" placeholder="Deadhead mi" inputmode="decimal"><div><b id="nRate">-</b></div></div></div>
+</div>
+
+<div class="card">
+ <h2>Rate vs miles</h2><div class="sub">Miles needed this week to reach your net goal at each rate (assumes every mile is paid, no deadhead), using your current cost settings and fixed costs. Fuel is the cash you'd burn getting there.</div><div style="overflow-x:auto"><table id="rt" style="width:100%;border-collapse:collapse;font-size:.85rem;margin-top:8px"></table></div></div>
+<div class="card">
+ <h2>My links</h2>
+ <div class="sub" style="margin-bottom:8px">Quick links to the sites you use. Add your own and they stay on this device.</div><div id="links"></div>
+ <div class="g2" style="margin-top:8px"><input type="text" id="lkN" placeholder="Name (e.g. Mining claims)"><input type="text" id="lkU" placeholder="Web address"></div><button class="btn g" style="margin-top:8px" onclick="addLink()">+ Add link</button>
+</div>
+<div class="card"><h2>Feedback</h2><div class="sub" style="margin-bottom:8px">Something confusing or missing? Tell us.</div><button class="btn g" onclick="feedback()">Send feedback</button></div>
+<div class="mu" style="text-align:center;padding-bottom:20px">Estimates only. Not tax or legal advice.<div style="margin-top:8px;letter-spacing:.14em;text-transform:uppercase;font-size:.72rem">Brought to you by DIST/TIME, LLC</div></div>
+</div>
+
+<button class="btn fab" onclick="goEval()">⚡ Evaluate load</button>
+<script>
+const $=id=>document.getElementById(id);
+const PRE={local:{dead:.03,extra:2},regional:{dead:.03,extra:3},otr:{dead:.02,extra:4}};
+let S={tripPrefs:'Cargo van, too tall for most drive-thrus.',ins:0,aDh:0,cash:0,netGoal:2000,fuel:6.49,mpg:21,wear:.15,mph:62,mileRate:.725,incTax:12,fixed:0,type:'local',dead:.03,extra:1,aMiles:500,aRate:1.5,aFlat:750};
+let LOG=[],SC=[],LINKS=[{n:'Recreation.gov',u:'https://www.recreation.gov'},{n:'The Dyrt',u:'https://thedyrt.com'},{n:'DAT Load Board',u:'https://www.dat.com'}];
+try{const d=JSON.parse(localStorage.getItem('fpe1')||'null');if(d){S=Object.assign(S,d.S);LOG=d.LOG||[];SC=d.SC||[];LINKS=d.LINKS||LINKS}}catch(e){}
+const save=()=>{try{localStorage.setItem('fpe1',JSON.stringify({S,LOG,SC,LINKS}))}catch(e){}};
+if(!S.hmAdded){LINKS.push({n:'Hivemapper',u:'https://hivemapper.com'});S.hmAdded=1;save()}
+if(!S.defV2){if(S.fuel===3.85&&S.mpg===9){S.fuel=6.49;S.mpg=21}S.defV2=1;save()}
+if(!S.waitV2){S.extra=1;S.waitV2=1;save()}
+if(!S.datV){const i=LINKS.findIndex(l=>/booking\.com/i.test(l.u));if(i>-1)LINKS[i]={n:'DAT Load Board',u:'https://www.dat.com'};S.datV=1;save()}
+const m$=n=>(n<0?'-':'')+'$'+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+const m0=n=>(n<0?'-':'')+'$'+Math.abs(Math.round(n)).toLocaleString();
+const n=v=>parseFloat(v)||0;
+const weekStart=()=>{const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7));return d.getTime()};
+
+function costs(mi){const fuel=mi/S.mpg*S.fuel,wear=mi*S.wear;return{fuel,wear,cash:fuel+wear}}
+function taxes(gross,mi){const t=Math.max(0,gross-mi*S.mileRate),se=t*.9235*.153,inc=Math.max(0,t-se/2)*S.incTax/100;return{taxable:t,se,inc,total:se+inc}}
+function week(L){let g=0,mi=0,c=0,h=0;L.forEach(x=>{g+=x.gross;mi+=x.miles;c+=x.cash;h+=x.hrs});const t=taxes(g,mi);return{gross:g,miles:mi,cash:c,hrs:h,tax:t.total,net:L.length?g-c-t.total:0}}
+const fixedWk=()=>(S.fixed||0)+(S.ins||0)*12/52;
+const weekNet=L=>{const w=week(L);return w.net-(L.length?fixedWk():0)};
+const acc=()=>LOG.filter(x=>x.t>=weekStart()).map(eff);
+const planned=()=>SC.filter(s=>s.runs>0&&s.miles>0).map(s=>{const lm=s.runs*s.miles,mi=lm+s.runs*(s.dh||0);return{miles:mi,gross:lm*s.rate,cash:costs(mi).cash,hrs:s.runs*((s.miles+(s.dh||0))/S.mph+S.extra)}});
+
+function analyze(){
+ const lm=S.aMiles,dh=S.aDh||0,mi=lm+dh,gross=lm*S.aRate,c=costs(mi),t=taxes(gross,mi),drive=mi/S.mph,clock=drive+S.extra,net=gross-c.cash-t.total;
+ return{mi,lm,dh,gross,c,t,drive,clock,net,hr:clock?net/clock:0,margin:gross?net/gross:0,be:lm?c.cash/lm:0}
+}
+function avgMargin(){const w=week(acc());if(w.gross>0&&w.net/w.gross>.05)return w.net/w.gross;const a=analyze();return a.margin>.05?a.margin:.35}
+
+function render(){
+ const a=analyze();
+ $('aDrive').textContent=a.drive.toFixed(1)+' hrs';
+ $('typeNote').textContent='Wait time is preset to '+Math.round(S.extra*60)+' min. Changing it affects your hours on the clock but not your net. After you accept a load, you can turn these into actuals.';
+ $('rNet').textContent=m$(a.net);$('rNet').className=a.net>=0?'ok':'bad';
+ $('rMargin').textContent=(a.margin*100).toFixed(1)+'% margin on '+m$(a.gross)+' · '+m$(a.mi?a.gross/a.mi:0)+'/mi all-in';
+ $('rHr').textContent=m$(a.hr)+'/hr';$('rHrSub').textContent=a.clock.toFixed(1)+' hrs on the clock';
+ $('rCost').textContent=m$(a.c.cash);$('rCostSub').textContent='Fuel '+m0(a.c.fuel)+' · Wear '+m0(a.c.wear);
+ $('rTax').textContent=m$(a.t.total);$('rTaxSub').textContent='SE '+m0(a.t.se)+' · Income '+m0(a.t.inc);
+ $('rBE').textContent=m$(a.be)+'/mi';
+ {const runs=a.net>0?(S.netGoal+fixedWk())/a.net:0;$('rGoal').innerHTML=a.net>0?'To net '+m0(S.netGoal)+(fixedWk()?' after '+m0(fixedWk())+' fixed costs':'')+' at this rate: <b>'+Math.ceil(runs)+' loads</b> · ~'+Math.round(runs*a.mi).toLocaleString()+' mi · ~'+Math.round(runs*a.clock)+' hrs on the clock (a week has 168)':'<b class="bad">This load loses money at this rate.</b>'}
+
+ const A=acc(),w=week(A),wn=weekNet(A),P=planned(),pn=weekNet(A.concat(P)),pw=week(A.concat(P));
+ $('heroSub').textContent='WEEK OF '+new Date(weekStart()).toLocaleDateString(undefined,{month:'short',day:'numeric'}).toUpperCase()+'  \u00b7  THE GOAL: '+m0(S.netGoal);
+ $('grossGoal').textContent=m0(S.netGoal/avgMargin());
+ $('wkLabel').textContent='Week of '+new Date(weekStart()).toLocaleDateString(undefined,{month:'short',day:'numeric'})+' · '+A.length+' accepted load'+(A.length==1?'':'s');
+ $('wNet').textContent=m$(wn);$('wNetSub').textContent=fixedWk()?'After '+m0(fixedWk())+' fixed weekly costs (incl. insurance)':'Accepted take-home pay';
+ $('wGap').textContent=m$(Math.max(0,S.netGoal-wn));
+ $('wGross').textContent=m0(w.gross);$('wMiles').textContent=w.miles.toLocaleString()+' mi';
+ $('wYield').textContent=w.miles?m$(w.gross/w.miles)+'/mi gross':'';
+ $('wHrs').textContent=w.hrs.toFixed(1)+' hrs';$('wHr').textContent=w.hrs?m$(wn/w.hrs)+'/hr net':'';
+ const pct=S.netGoal>0?Math.max(0,Math.min(100,pn/S.netGoal*100)):0;
+ $('pBar').style.width=pct+'%';$('pctTxt').textContent=Math.round(pct)+'%';
+
+ $('pNet').textContent=m0(pn-wn);$('pMiles').textContent=(pw.miles-w.miles).toLocaleString();
+ $('pGap').textContent=m0(Math.max(0,S.netGoal-pn));
+ const nm=n($('nMiles').value),nd=n($('nDh').value);
+ if(nm>0){const target=S.netGoal;let lo=0,hi=30;const f=r=>weekNet(A.concat(P,[{miles:nm+nd,gross:nm*r,cash:costs(nm+nd).cash,hrs:0}]));
+  if(f(hi)<target)$('nRate').textContent='Not reachable';else if(f(0)>=target)$('nRate').textContent='Already there';
+  else{for(let i=0;i<40;i++){const mid=(lo+hi)/2;f(mid)<target?lo=mid:hi=mid}$('nRate').textContent=m$(hi)+'/mi'}
+ }else $('nRate').textContent='-';
+ renderLog();
+}
+function renderLog(){
+ const ws=weekStart();
+ $('log').innerHTML=LOG.length?[...LOG].reverse().map(x=>`<div class="lrow ${x.t<ws?'old':''}"><div class="row"><b>${new Date(x.t).toLocaleDateString(undefined,{month:'short',day:'numeric'})}${x.note?' · '+esc(x.note):''}</b><button class="x" onclick="delLoad(${x.id})">✕</button></div><div class="mu">${x.loaded??x.miles} loaded + ${x.dh||0} deadhead mi @ ${m$(x.rate)}/mi · Gross ${m$(x.gross)} · Costs ${m$(x.cash)} (fuel ${m$(fuelOf(x))}) · ${fmtHM(x.hrs)} on the clock</div><div style="margin-top:3px"><b class="${ln(x)>=0?'ok':'bad'}">Net ${m$(ln(x))}</b> <span class="mu">· ${m$(ln(x)/(x.hrs||1))}/hr · ${(ln(x)/(x.gross||1)*100).toFixed(0)}% margin</span></div>${rowAct(x)}</div>`).join(''):'<div class="mu" style="padding:14px 0;text-align:center">No loads logged yet.</div>';
+ if(!window.keepSc)$('scs').innerHTML=SC.length?SC.map(s=>`<div class="sc"><div class="g3"><div><label>Runs</label><input type="number" value="${s.runs}" oninput="upSc(${s.id},'runs',this.value)"></div><div><label>Miles</label><input type="number" value="${s.miles}" oninput="upSc(${s.id},'miles',this.value)"></div><div><label>Rate $/mi</label><input type="number" step="0.05" value="${s.rate}" oninput="upSc(${s.id},'rate',this.value)"></div></div><div class="f" style="margin-top:8px"><label>Deadhead mi (each run)</label><input type="number" value="${s.dh||0}" oninput="upSc(${s.id},'dh',this.value)"></div><div class="mu" style="margin-top:6px">Est. fuel &amp; drive time: <b id="sf${s.id}"></b></div><button class="x" onclick="delSc(${s.id})">Remove</button></div>`).join(''):'<div class="mu" style="padding:6px 0 12px">No rows yet. Add one to test combinations.</div>';
+ renderExtra();
+}
+let EDIT=null;
+function wordsToNum(t){t=t.toLowerCase().replace(/,/g,'').replace(/-/g,' ');const m=t.match(/\d+(\.\d+)?/);if(m)return parseFloat(m[0]);
+ const U={zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19},T={twenty:20,thirty:30,forty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90};
+ let tot=0,cur=0,any=false;for(const w of t.split(/\s+/)){if(w in U){cur+=U[w];any=true}else if(w in T){cur+=T[w];any=true}else if(w==='hundred'){cur=(cur||1)*100;any=true}else if(w==='thousand'){tot+=(cur||1)*1000;cur=0;any=true}}
+ return any?tot+cur:null}
+function micMiles(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){alert('Voice input is not supported in this browser. Try Chrome.');return}
+ const r=new SR(),b=$('micBtn');r.lang='en-US';r.interimResults=false;r.maxAlternatives=3;b.textContent='🎙 Listening…';
+ r.onresult=e=>{let v=null;for(let i=0;i<e.results[0].length&&v==null;i++)v=wordsToNum(e.results[0][i].transcript);if(v!=null&&v>0){S.aMiles=v;$('aMiles').value=v;S.aFlat=+(S.aMiles*S.aRate).toFixed(2);$('aFlat').value=S.aFlat;save();render()}else alert('Did not catch the miles. Try again.')};
+ r.onerror=()=>alert('Could not use the microphone. Check that mic permission is allowed for this site.');
+ r.onend=()=>{b.textContent='🎙 Say miles'};r.start()}
+function applyTheme(){document.documentElement.setAttribute('data-theme',S.theme==='day'?'day':'night');$('themeBtn').textContent=S.theme==='day'?'🌙 Night mode':'☀ Day mode'}
+function toggleTheme(){S.theme=S.theme==='day'?'night':'day';save();applyTheme()}
+const fuelOf=x=>x.act&&x.act.fuel!=null?x.act.fuel:(x.fuel!=null?x.fuel:x.cash*(S.fuel/S.mpg)/((S.fuel/S.mpg)+S.wear));
+function planTrip(id,btn){const x=LOG.find(l=>l.id===id);if(!x)return;const lm=x.loaded??x.miles,dh=x.dh||0,tot=lm+dh,drv=tot/S.mph,d=x.addr||{};
+ const pu=[d.pa,d.pz].filter(Boolean).join(' '),dr=[d.da,d.dz].filter(Boolean).join(' ');
+ const t=new Date().toLocaleString(undefined,{weekday:'long',hour:'numeric',minute:'2-digit'});
+ const txt=['I drive a cargo van for freight (hotshot / last mile) and I just booked a load. Please help me plan the trip.','',
+ 'Load: '+lm+' loaded miles'+(dh?' plus '+dh+' miles to the pickup':'')+' ('+tot+' miles total, roughly '+fmtHM(drv)+' of driving at about '+S.mph+' mph).',
+ x.note?'Lane / note: '+x.note:null,pu?'Pickup: '+pu:null,dr?'Drop-off: '+dr:null,
+ 'Loading, unloading and waiting: about '+Math.round(Math.max(0,x.hrs-x.miles/S.mph)*60)+' minutes in total.',
+ 'It is currently '+t+' my time.',
+ S.tripPrefs?'About me and my vehicle: '+S.tripPrefs:null,'',
+ 'First, ask me how many hours I plan to drive on the first leg and whether I want food or rest. Then suggest good places to stop (food, fuel, rest) along the way that will be open when I get there and are easy to get a van into. Mention traffic or road issues if you can, and tell me when you are unsure so I can double-check hours and conditions. Keep it short and friendly.'].filter(v=>v!==null).join('\n');
+ const done=()=>{const o=btn.textContent;btn.textContent='Copied! Paste into your AI chat app';setTimeout(()=>btn.textContent=o,2800)};
+ const fb=()=>{window.prompt('Copy this and paste it into your AI chat app:',txt)};
+ try{navigator.clipboard.writeText(txt).then(done,fb)}catch(er){fb()}}
+function goEval(){const e=$('aMiles');e.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>{e.focus();e.select()},400)}
+function fmtHM(hh){const m=Math.round(hh*60);return Math.floor(m/60)+'h '+(m%60)+'m'}
+const FEEDBACK_URL='';
+function feedback(){if(!FEEDBACK_URL){alert('The feedback link is not set up yet.');return}window.open(FEEDBACK_URL,'_blank','noopener')}
+function addrUI(x){const d=x.addr||{};return '<div class="g2">'+[['eA','Pickup address',d.pa],['eB','Pickup zip',d.pz],['eC','Drop-off address',d.da],['eE','Drop-off zip',d.dz]].map(([i,l,v])=>'<div class="f"><label>'+l+' (optional)</label><input type="text" id="'+i+'" value="'+esc(v||'')+'"></div>').join('')+'</div>'}
+function addrLine(x){const d=x.addr;if(!d)return '';const a=[[d.pa,d.pz].filter(Boolean).join(' '),[d.da,d.dz].filter(Boolean).join(' ')].filter(Boolean).join(' \u2192 ');return '<div class="mu" style="margin-top:4px">'+esc(a)+'</div>'}
+function renderLinks(){$('links').innerHTML=LINKS.length?LINKS.map((l,i)=>'<div class="row lrow"><a href="'+esc(l.u)+'" target="_blank" rel="noopener noreferrer" style="color:var(--ac);font-weight:600;text-decoration:none;display:flex;align-items:center;font-size:1.05rem">'+favImg(l)+esc(l.n)+' \u2197</a><button class="x" onclick="delLink('+i+')">\u2715</button></div>').join(''):'<div class="mu" style="padding:6px 0">No links yet.</div>'}
+function favImg(l){let h='';try{h=new URL(l.u).hostname}catch(e){}return '<img src="https://www.google.com/s2/favicons?domain='+encodeURIComponent(h)+'&sz=64" width="32" height="32" alt="" data-n="'+esc((l.n||'?').charAt(0).toUpperCase())+'" onerror="lgFall(this)" style="border-radius:8px;margin-right:12px;background:var(--in)">'}
+function lgFall(i){const s=document.createElement('span');s.className='lg';s.textContent=i.dataset.n;i.replaceWith(s)}
+function addLink(){const nme=$('lkN').value.trim();let u=$('lkU').value.trim();if(!nme||!u)return;if(!/^https?:\/\//i.test(u))u='https://'+u;LINKS.push({n:nme,u});$('lkN').value='';$('lkU').value='';save();renderLinks()}
+function delLink(i){LINKS.splice(i,1);save();renderLinks()}
+const eff=x=>{const a=x.act;if(!a)return x;const lm=a.loaded!=null?a.loaded:(x.loaded??x.miles),dh=a.dh!=null?a.dh:(x.dh||0),mi=lm+dh,gross=a.paid!=null?a.paid:x.gross,cash=a.fuel!=null?a.fuel+mi*S.wear:x.cash*mi/(x.miles||1);return{...x,miles:mi,gross,cash,hrs:(a.drive!=null||a.wait!=null)?(a.drive!=null?a.drive:mi/S.mph)+(a.wait!=null?a.wait/60:Math.max(0,x.hrs-x.miles/S.mph)):(a.hrs!=null?a.hrs:x.hrs)}};
+const an=x=>{if(!x.act)return null;const e=eff(x);return e.gross-e.cash-taxes(e.gross,e.miles).total};
+const K=['pu','dof'];
+function stampUI(x){if(!S.geo)return '';const tm=o=>new Date(o.t).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
+ const one=(i,l)=>x[K[i]]?'<span class="ok">'+l+' \u2713 '+tm(x[K[i]])+'</span> <button class="x" style="font-size:.8rem" onclick="clearStamp('+x.id+','+i+')">clear</button>':'<button class="btn s g" onclick="stamp('+x.id+','+i+')">Stamp '+l.toLowerCase()+'</button>';
+ return '<div class="row" style="margin-top:8px;flex-wrap:wrap;justify-content:flex-start;gap:10px">'+one(0,'Pickup')+one(1,'Drop-off')+'</div>'}
+function stamp(id,i){const x=LOG.find(l=>l.id===id);if(!x)return;if(!navigator.geolocation){alert('Location is not available in this browser.');return}
+ navigator.geolocation.getCurrentPosition(p=>{x[K[i]]={t:Date.now(),la:Math.round(p.coords.latitude*10)/10,lo:Math.round(p.coords.longitude*10)/10};save();render()},()=>alert('Could not get your location. Make sure location is allowed for this site.'),{enableHighAccuracy:false,timeout:15000,maximumAge:60000})}
+function clearStamp(id,i){const x=LOG.find(l=>l.id===id);if(x){delete x[K[i]];save();render()}}
+function rowAct(x){
+ if(EDIT===x.id){const a=x.act||{};return '<div class="g2" style="margin-top:8px">'+[['eP','Actual paid $',a.paid],['eL','Actual loaded mi',a.loaded],['eD','Actual deadhead mi',a.dh],['eF','Actual fuel $',a.fuel],['eV','Actual drive time (hrs)',a.drive],['eW','Actual wait time (min)',a.wait]].map(([i,l,v])=>'<div class="f"><label>'+l+'</label><input type="number" id="'+i+'" inputmode="decimal" placeholder="blank = estimate" value="'+(v!=null?v:'')+'"></div>').join('')+'</div>'+addrUI(x)+'<div class="row"><button class="btn s" onclick="saveAct('+x.id+')">Save actuals</button><button class="btn s g" onclick="EDIT=null;render()">Cancel</button></div>'}
+ const q=an(x);
+ return (q!=null?'<div style="margin-top:3px"><b class="'+(q>=0?'ok':'bad')+'">Actual net '+m$(q)+'</b> <span class="mu">· '+(q-ln(x)>=0?'+':'')+m$(q-ln(x))+' vs estimate</span></div>':'')+addrLine(x)+stampUI(x)+'<div style="margin-top:6px"><button class="btn s g" onclick="EDIT='+x.id+';render()">'+(x.act||x.addr?'Edit actuals & addresses':'Actuals & addresses')+'</button> <button class="btn s g" onclick="planTrip('+x.id+',this)">Plan my trip</button></div>'}
+function saveAct(id){const x=LOG.find(l=>l.id===id);if(!x)return;const g=i=>{const v=$(i).value;return v===''?null:n(v)};const a={paid:g('eP'),loaded:g('eL'),dh:g('eD'),fuel:g('eF'),drive:g('eV'),wait:g('eW')};Object.keys(a).forEach(k=>{if(a[k]===null)delete a[k]});if(Object.keys(a).length)x.act=a;else delete x.act;{const ad={pa:$('eA').value.trim(),pz:$('eB').value.trim(),da:$('eC').value.trim(),dz:$('eE').value.trim()};if(Object.values(ad).some(v=>v))x.addr=ad;else delete x.addr}EDIT=null;save();render()}
+function renderExtra(){renderLinks();$('fixedNote').textContent='Fixed costs: '+m$(fixedWk())+'/week ('+m$((S.ins||0)*12/52)+' insurance'+(S.insCo?', '+S.insCo:'')+' + '+m$(S.fixed||0)+' other)';
+ SC.forEach(s=>{const e=$('sf'+s.id);if(e){const mi=s.runs*(s.miles+(s.dh||0)),g=mi/S.mpg;e.textContent=m0(g*S.fuel)+' ('+Math.round(g)+' gal) · '+fmtHM(mi/S.mph)+' driving'}});
+ const PP=planned(),pm=PP.reduce((t,x)=>t+x.miles,0);$('pTot').textContent=pm?'Planned runs: '+m0(pm/S.mpg*S.fuel)+' fuel · '+fmtHM(pm/S.mph)+' driving':'';
+ 
+ 
+ 
+ const f=(M,r)=>weekNet([{miles:M,gross:M*r,cash:costs(M).cash,hrs:0}]);
+ $('rt').innerHTML='<tr class="mu"><th align="left">Rate</th><th align="right">Net/mi</th><th align="right">Miles</th><th align="right">Drive hrs</th><th align="right">Fuel</th></tr>'+[.6,.8,1,1.2,1.4,1.6,1.8,2].map(r=>{
+  if(f(1e5,r)<S.netGoal)return '<tr style="border-top:1px solid var(--bd)"><td style="padding:7px 0">'+m$(r)+'</td><td colspan="4" align="right" class="bad">Not reachable</td></tr>';
+  let lo=0,hi=1e5;for(let i=0;i<40;i++){const mid=(lo+hi)/2;f(mid,r)<S.netGoal?lo=mid:hi=mid}
+  const M=hi,h=M/S.mph,nm=week([{miles:M,gross:M*r,cash:costs(M).cash,hrs:0}]).net/M;
+  return '<tr style="border-top:1px solid var(--bd)"><td style="padding:7px 0">'+m$(r)+'</td><td align="right">'+m$(nm)+'</td><td align="right">'+Math.round(M).toLocaleString()+'</td><td align="right" class="'+(h>168?'bad':h>100?'wa':'ok')+'">'+h.toFixed(0)+'</td><td align="right">'+m0(M/S.mpg*S.fuel)+'</td></tr>'}).join('');
+}
+const ln=x=>x.net!=null?x.net:x.gross-x.cash-taxes(x.gross,x.miles).total;
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function acceptLoad(){
+ const a=analyze();if(!a.mi||!a.gross)return;
+ LOG.push({id:Date.now(),t:Date.now(),miles:a.mi,loaded:a.lm,dh:a.dh,rate:S.aRate,gross:a.gross,cash:a.c.cash,fuel:a.c.fuel,net:a.net,hrs:a.clock,note:$('aNote').value.trim()});
+ $('aNote').value='';save();render();
+}
+function delLoad(id){LOG=LOG.filter(x=>x.id!==id);save();render()}
+function addSc(){SC.push({id:Date.now(),runs:1,miles:500,dh:0,rate:2});save();render()}
+function delSc(id){SC=SC.filter(x=>x.id!==id);save();render()}
+function upSc(id,k,v){const s=SC.find(x=>x.id===id);if(s){s[k]=n(v);save();window.keepSc=true;render();window.keepSc=false}}
+
+ 
+function copyCsv(){
+ const rows=[['date','type','lane_note','total_miles','loaded_miles','deadhead_miles','rate_per_mile','gross','cash_costs','fuel_cost','clock_hours','net','actual_paid','actual_loaded_mi','actual_deadhead_mi','actual_fuel','actual_drive_hrs','actual_wait_min','actual_net','pickup_time','pickup_lat','pickup_lon','dropoff_time','dropoff_lat','dropoff_lon','pickup_address','pickup_zip','dropoff_address','dropoff_zip']].concat(LOG.map(x=>[new Date(x.t).toISOString().slice(0,10),(x.type||''),'"'+(x.note||'').replace(/"/g,'""')+'"',x.miles,x.loaded??x.miles,x.dh||0,x.rate,x.gross.toFixed(2),x.cash.toFixed(2),fuelOf(x).toFixed(2),x.hrs.toFixed(2),ln(x).toFixed(2),...(x.act?[x.act.paid??'',x.act.loaded??'',x.act.dh??'',x.act.fuel??'',x.act.drive??'',x.act.wait??'',an(x).toFixed(2)]:['','','','','','','']),...[x.pu,x.dof].flatMap(s=>s?[new Date(s.t).toISOString(),s.la,s.lo]:['','','']),...['pa','pz','da','dz'].map(k=>'"'+String((x.addr||{})[k]||'').replace(/"/g,'""')+'"')]));
+ const txt=rows.map(r=>r.join(',')).join('\n');
+ const done=()=>{$('csvBtn').textContent='Copied!';setTimeout(()=>$('csvBtn').textContent='Copy CSV',1500)};
+ try{navigator.clipboard.writeText(txt).then(done,()=>fb())}catch(e){fb()}
+ function fb(){const t=document.createElement('textarea');t.value=txt;document.body.appendChild(t);t.select();try{document.execCommand('copy');done()}catch(e){}t.remove()}
+}
+
+['netGoal','fuel','mpg','wear','mph','mileRate','incTax','fixed','ins'].forEach(k=>{
+ $(k).value=S[k];$(k).addEventListener('input',e=>{S[k]=n(e.target.value);save();render()})});
+$('nMiles').addEventListener('input',render);$('nDh').addEventListener('input',render);
+$('aMiles').value=S.aMiles;$('aRate').value=S.aRate;$('aFlat').value=S.aFlat;$('aDh').value=S.aDh||0;$('aDh').addEventListener('input',e=>{S.aDh=n(e.target.value);save();render()});$('extra').value=Math.round(S.extra*60);$('extra').addEventListener('input',e=>{S.extra=n(e.target.value)/60;save();render()});$('insCo').value=S.insCo||'';$('insCo').addEventListener('input',e=>{S.insCo=e.target.value;save();render()});$('tripPrefs').value=S.tripPrefs||'';$('tripPrefs').addEventListener('input',e=>{S.tripPrefs=e.target.value;save()});$('geo').checked=!!S.geo;$('geo').addEventListener('change',e=>{S.geo=e.target.checked;save();render()});
+$('aMiles').addEventListener('input',e=>{S.aMiles=n(e.target.value);S.aFlat=+(S.aMiles*S.aRate).toFixed(2);$('aFlat').value=S.aFlat;save();render()});
+$('aRate').addEventListener('input',e=>{S.aRate=n(e.target.value);S.aFlat=+(S.aMiles*S.aRate).toFixed(2);$('aFlat').value=S.aFlat;save();render()});
+$('aFlat').addEventListener('input',e=>{S.aFlat=n(e.target.value);S.aRate=S.aMiles?+(S.aFlat/S.aMiles).toFixed(3):0;$('aRate').value=S.aRate;save();render()});
+function setType(t,load){S.type=t;if(load){S.extra=PRE[t].extra;$('extra').value=Math.round(S.extra*60)}
+ document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));save();render()}
+document.querySelectorAll('#seg button').forEach(b=>b.onclick=()=>setType(b.dataset.t,true));
+applyTheme();setType(S.type,false);
+const _go=$('goBubble');function playGo(){_go.classList.remove('play');void _go.getBoundingClientRect();_go.classList.add('play')}
+if(!S.seenGo){S.seenGo=1;save();playGo()}
+let _bk=0;const _ey=document.querySelector('.eyes');if(_ey)_ey.addEventListener('animationiteration',()=>{if(++_bk%5===0)playGo()});
+$('heroSvg').addEventListener('click',playGo);
+</script>
+<script>if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))</script></body></html>
