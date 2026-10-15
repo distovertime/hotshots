@@ -5,9 +5,9 @@
 <meta name="theme-color" content="#020611">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Freight Profit">
+<meta name="apple-mobile-web-app-title" content="Hotshots">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>Freight Profit Engine - Signal</title>
+<title>Hotshots</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#020611;--card:rgba(8,22,52,.62);--in:rgba(2,8,28,.55);--bd:rgba(130,195,255,.25);--tx:#e6f1ff;--mu:#8fb0d8;--ac:#4aa8ff;--ok:#5ff0c0;--wa:#ffb454;--bad:#ff7a8a;--pu:#a9c4ff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -352,7 +352,7 @@ function copyCsv(){
 ['netGoal','fuel','mpg','wear','mph','mileRate','incTax','fixed','ins'].forEach(k=>{
  $(k).value=S[k];$(k).addEventListener('input',e=>{S[k]=n(e.target.value);save();render()})});
 $('nMiles').addEventListener('input',render);$('nDh').addEventListener('input',render);
-$('aMiles').value=S.aMiles;$('aRate').value=S.aRate;$('aFlat').value=S.aFlat;$('aDh').value=S.aDh||0;$('aDh').addEventListener('input',e=>{S.aDh=n(e.target.value);save();render()});$('extra').value=Math.round(S.extra*60);$('extra').addEventListener('input',e=>{S.extra=n(e.target.value)/60;save();render()});$('insCo').value=S.insCo||'';$('insCo').addEventListener('input',e=>{S.insCo=e.target.value;save();render()});$('tripPrefs').value=S.tripPrefs||'';$('tripPrefs').addEventListener('input',e=>{S.tripPrefs=e.target.value;save()});$('geo').checked=!!S.geo;$('geo').addEventListener('change',e=>{S.geo=e.target.checked;save();render()});
+$('aMiles').value=S.aMiles;$('aRate').value=S.aRate;$('aFlat').value=S.aFlat;$('aDh').value=S.aDh||0;$('aDh').addEventListener('input',e=>{S.aDh=n(e.target.value);save();render()});$('extra').value=Math.round(S.extra*60);$('extra').addEventListener('input',e=>{S.extra=n(e.target.value)/60;save();render()});$('insCo').value=S.insCo||'';$('insCo').addEventListener('input',e=>{S.insCo=e.target.value;save();render()});$('tripPrefs').value=S.tripPrefs||'';$('tripPrefs').addEventListener('input',e=>{S.tripPrefs=e.target.value;save()});$('geo').checked=!!S.geo;$('geo').addEventListener('change',e=>{S.geo=e.target.checked;save();render();if(S.geo&&navigator.geolocation)navigator.geolocation.getCurrentPosition(()=>{},()=>{},{timeout:10000})});
 $('aMiles').addEventListener('input',e=>{S.aMiles=n(e.target.value);S.aFlat=+(S.aMiles*S.aRate).toFixed(2);$('aFlat').value=S.aFlat;save();render()});
 $('aRate').addEventListener('input',e=>{S.aRate=n(e.target.value);S.aFlat=+(S.aMiles*S.aRate).toFixed(2);$('aFlat').value=S.aFlat;save();render()});
 $('aFlat').addEventListener('input',e=>{S.aFlat=n(e.target.value);S.aRate=S.aMiles?+(S.aFlat/S.aMiles).toFixed(3):0;$('aRate').value=S.aRate;save();render()});
