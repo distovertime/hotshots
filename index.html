@@ -291,7 +291,7 @@ function planTrip(id,btn){const x=LOG.find(l=>l.id===id);if(!x)return;const lm=x
  try{navigator.clipboard.writeText(txt).then(done,fb)}catch(er){fb()}}
 function goEval(){const e=$('aMiles');e.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>{e.focus();e.select()},400)}
 function fmtHM(hh){const m=Math.round(hh*60);return Math.floor(m/60)+'h '+(m%60)+'m'}
-const FEEDBACK_URL='';
+const FEEDBACK_URL='https://docs.google.com/forms/d/e/1FAIpQLSdNw0ja1UXYpHfrF2PwuDgxJBvb57zskZt1_Snve3DJHcFuzg/viewform';
 function feedback(){if(!FEEDBACK_URL){alert('The feedback link is not set up yet.');return}window.open(FEEDBACK_URL,'_blank','noopener')}
 function addrUI(x){const d=x.addr||{};return '<div class="g2">'+[['eA','Pickup address',d.pa],['eB','Pickup zip',d.pz],['eC','Drop-off address',d.da],['eE','Drop-off zip',d.dz]].map(([i,l,v])=>'<div class="f"><label>'+l+' (optional)</label><input type="text" id="'+i+'" value="'+esc(v||'')+'"></div>').join('')+'</div>'}
 function addrLine(x){const d=x.addr;if(!d)return '';const a=[[d.pa,d.pz].filter(Boolean).join(' '),[d.da,d.dz].filter(Boolean).join(' ')].filter(Boolean).join(' \u2192 ');return '<div class="mu" style="margin-top:4px">'+esc(a)+'</div>'}
