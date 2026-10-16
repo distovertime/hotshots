@@ -190,7 +190,7 @@ summary{cursor:pointer;font-weight:600;font-size:.9rem}
  <div class="g2" style="margin-top:8px"><input type="text" id="lkN" placeholder="Name (e.g. Mining claims)"><input type="text" id="lkU" placeholder="Web address"></div><button class="btn g" style="margin-top:8px" onclick="addLink()">+ Add link</button>
 </div>
 <div class="card"><h2>Feedback</h2><div class="sub" style="margin-bottom:8px">Something confusing or missing? Tell us.</div><button class="btn g" onclick="feedback()">Send feedback</button></div>
-<div class="mu" style="text-align:center;padding-bottom:20px">Estimates only. Not tax or legal advice.<div style="margin-top:8px;letter-spacing:.14em;text-transform:uppercase;font-size:.72rem">Brought to you by DIST/TIME, LLC</div></div>
+<div class="mu" style="text-align:center;padding-bottom:20px">Estimates only. Not tax or legal advice.<br>Anonymous visit counts (GoatCounter). Your trips and settings stay on your device.<div style="margin-top:8px;letter-spacing:.14em;text-transform:uppercase;font-size:.72rem">Brought to you by DIST/TIME, LLC</div></div>
 </div>
 
 <button class="btn fab" onclick="goEval()">⚡ Evaluate load</button>
@@ -365,4 +365,6 @@ if(!S.seenGo){S.seenGo=1;save();playGo()}
 let _bk=0;const _ey=document.querySelector('.eyes');if(_ey)_ey.addEventListener('animationiteration',()=>{if(++_bk%5===0)playGo()});
 $('heroSvg').addEventListener('click',playGo);
 </script>
-<script>if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))</script></body></html>
+<script>if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))</script><script data-goatcounter="https://distovertime.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+</body></html>
