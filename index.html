@@ -165,7 +165,7 @@ input[type=date],input[type=time]{color-scheme:dark}:root[data-theme="day"] inpu
 </div>
 
 <div class="card">
- <div class="row"><h2>Trip log</h2><button class="btn s g" onclick="copyCsv()" id="csvBtn">Copy CSV</button></div>
+ <div class="row"><h2>Trip log</h2><span><button class="btn s g" onclick="copyCsv()" id="csvBtn">Copy for Sheets</button> <button class="btn s g" onclick="dlCsv()">Download CSV</button></span></div>
  <div class="sub">Every accepted load is saved on this device. After the run, tap Enter actuals to compare what really happened to your estimate. Older weeks are dimmed.</div>
  <div id="log"></div>
 </div>
@@ -263,7 +263,7 @@ function render(){
 }
 function renderLog(){
  const ws=weekStart();
- $('log').innerHTML=LOG.length?[...LOG].sort((a,b)=>b.t-a.t).map(x=>`<div class="lrow ${x.t<ws?'old':''}"><div class="row"><b>${dateSel(x)}${x.note?' · '+esc(x.note):''}</b><button class="x" onclick="delLoad(${x.id})">✕</button></div><div class="mu">${x.loaded??x.miles} loaded + ${x.dh||0} deadhead mi @ ${m$(x.rate)}/mi · Gross ${m$(x.gross)} · Costs ${m$(x.cash)} (fuel ${m$(fuelOf(x))}) · ${fmtHM(x.hrs)} on the clock</div><div style="margin-top:3px"><b class="${ln(x)>=0?'ok':'bad'}">Net ${m$(ln(x))}</b> <span class="mu">· ${m$(ln(x)/(x.hrs||1))}/hr · ${(ln(x)/(x.gross||1)*100).toFixed(0)}% margin</span></div>${rowAct(x)}</div>`).join(''):'<div class="mu" style="padding:14px 0;text-align:center">No loads logged yet.</div>';
+ $('log').innerHTML=LOG.length?[...LOG].sort((a,b)=>b.t-a.t).map(x=>`<div class="lrow ${x.t<ws?'old':''}"><div class="row"><b>${dateSel(x)}${x.note?' · '+esc(x.note):''}</b><button class="x" onclick="delLoad(${x.id})">✕</button></div><div class="mu">${rowLine(x)}</div><div style="margin-top:3px"><b class="${ln(x)>=0?'ok':'bad'}">${x.act?'Est. net':'Net'} ${m$(ln(x))}</b> <span class="mu">· ${m$(ln(x)/(x.hrs||1))}/hr · ${(ln(x)/(x.gross||1)*100).toFixed(0)}% margin</span></div>${rowAct(x)}</div>`).join(''):'<div class="mu" style="padding:14px 0;text-align:center">No loads logged yet.</div>';
  if(!window.keepSc)$('scs').innerHTML=SC.length?SC.map(s=>`<div class="sc"><div class="g3"><div><label>Runs</label><input type="number" value="${s.runs}" oninput="upSc(${s.id},'runs',this.value)"></div><div><label>Miles</label><input type="number" value="${s.miles}" oninput="upSc(${s.id},'miles',this.value)"></div><div><label>Rate $/mi</label><input type="number" step="0.05" value="${s.rate}" oninput="upSc(${s.id},'rate',this.value)"></div></div><div class="f" style="margin-top:8px"><label>Deadhead mi (each run)</label><input type="number" value="${s.dh||0}" oninput="upSc(${s.id},'dh',this.value)"></div><div class="mu" style="margin-top:6px">Est. fuel &amp; drive time: <b id="sf${s.id}"></b></div><button class="x" onclick="delSc(${s.id})">Remove</button></div>`).join(''):'<div class="mu" style="padding:6px 0 12px">No rows yet. Add one to test combinations.</div>';
  renderExtra();
 }
@@ -279,7 +279,7 @@ function micMiles(){const SR=window.SpeechRecognition||window.webkitSpeechRecogn
  r.onend=()=>{b.textContent='🎙 Say miles'};r.start()}
 function applyTheme(){document.documentElement.setAttribute('data-theme',S.theme==='day'?'day':'night');$('themeBtn').textContent=S.theme==='day'?'🌙 Night mode':'☀ Day mode'}
 function toggleTheme(){S.theme=S.theme==='day'?'night':'day';save();applyTheme()}
-const fuelOf=x=>x.act&&x.act.fuel!=null?x.act.fuel:(x.fuel!=null?x.fuel:x.cash*(S.fuel/S.mpg)/((S.fuel/S.mpg)+S.wear));
+const fuelOf=x=>{const b=x.act&&x.act.fuel!=null?x.act.fuel:(x.fuel!=null?x.fuel:x.cash*(S.fuel/S.mpg)/((S.fuel/S.mpg)+S.wear));return x.act&&x.act.fuel==null?b*eff(x).miles/(x.miles||1):b};
 function planTrip(id,btn){const x=LOG.find(l=>l.id===id);if(!x)return;const lm=x.loaded??x.miles,dh=x.dh||0,tot=lm+dh,drv=tot/S.mph,d=x.addr||{},sc=x.sched||{};
  const pu=[d.pa,d.pz].filter(Boolean).join(' '),dr=[d.da,d.dz].filter(Boolean).join(' ');
  const t=new Date().toLocaleString(undefined,{weekday:'long',hour:'numeric',minute:'2-digit'});
@@ -297,7 +297,9 @@ const fmtD=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d).t
 const fmtT=s=>{const [h,m]=s.split(':').map(Number);return new Date(2000,0,1,h,m).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})};
 function schedUI(x){const s=x.sched||{};const f=(i,l,t,v)=>'<div class="f"><label>'+l+' (optional)</label><input type="'+t+'" id="'+i+'" value="'+esc(v||'')+'"></div>';
  return '<div class="g2">'+f('sPD','Pickup date','date',s.pd)+f('sPT','Pickup time','time',s.pt)+f('sDD','Drop-off date','date',s.dd)+f('sDT','Drop-off time','time',s.dt)+'</div>'}
-function schedLine(x){const s=x.sched;if(!s)return '';const a=[[s.pd?fmtD(s.pd):'',s.pt?fmtT(s.pt):''].filter(Boolean).join(' '),[s.dd?fmtD(s.dd):'',s.dt?fmtT(s.dt):''].filter(Boolean).join(' ')];if(!a[0]&&!a[1])return '';return '<div class="mu" style="margin-top:4px">'+(a[0]?'Pickup '+esc(a[0]):'')+(a[0]&&a[1]?' \u2192 ':'')+(a[1]?'Drop-off '+esc(a[1]):'')+'</div>'}
+function schedLine(x){const s=x.sched;if(!s)return '';const a=[[s.pd?fmtD(s.pd):'',s.pt?fmtT(s.pt):''].filter(Boolean).join(' '),[s.dd?fmtD(s.dd):'',s.dt?fmtT(s.dt):''].filter(Boolean).join(' ')];if(!a[0]&&!a[1])return '';const el=(s.pd&&s.pt&&s.dd&&s.dt)?(()=>{const p=s.pd.split('-').map(Number),q=s.pt.split(':').map(Number),r=s.dd.split('-').map(Number),u=s.dt.split(':').map(Number);const m=(new Date(r[0],r[1]-1,r[2],u[0],u[1])-new Date(p[0],p[1]-1,p[2],q[0],q[1]))/36e5;return m>0?' · '+fmtHM(m)+' pickup to drop-off':''})():'';return '<div class="mu" style="margin-top:4px">'+(a[0]?'Pickup '+esc(a[0]):'')+(a[0]&&a[1]?' \u2192 ':'')+(a[1]?'Drop-off '+esc(a[1]):'')+el+'</div>'}
+function rowLine(x){const e=eff(x),a=x.act,lm=a&&a.loaded!=null?a.loaded:(x.loaded??x.miles),dh=a&&a.dh!=null?a.dh:(x.dh||0);
+ return lm+' loaded + '+dh+' deadhead mi @ '+m$(lm?e.gross/lm:x.rate)+'/mi \u00b7 Gross '+m$(e.gross)+' \u00b7 Costs '+m$(e.cash)+' (fuel '+m$(fuelOf(x))+') \u00b7 '+fmtHM(e.hrs)+' on the clock'+(a?' (actuals)':'')}
 function dayKey(t){const d=new Date(t);return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate()}
 function dateSel(x){const base=new Date();base.setHours(12,0,0,0);const o=[],cur=dayKey(x.t);let found=false;
  for(let i=-7;i<=14;i++){const d=new Date(base);d.setDate(base.getDate()+i);const s=dayKey(d.getTime())===cur;if(s)found=true;o.push('<option value="'+d.getTime()+'"'+(s?' selected':'')+'>'+d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})+(i===0?' (today)':'')+'</option>')}
@@ -327,7 +329,7 @@ function clearStamp(id,i){const x=LOG.find(l=>l.id===id);if(x){delete x[K[i]];sa
 function rowAct(x){
  if(EDIT===x.id){const a=x.act||{};return '<div class="g2" style="margin-top:8px">'+[['eP','Actual paid $',a.paid],['eL','Actual loaded mi',a.loaded],['eD','Actual deadhead mi',a.dh],['eF','Actual fuel $',a.fuel],['eV','Actual drive time (hrs)',a.drive],['eW','Actual wait time (min)',a.wait]].map(([i,l,v])=>'<div class="f"><label>'+l+'</label><input type="number" id="'+i+'" inputmode="decimal" placeholder="blank = estimate" value="'+(v!=null?v:'')+'"></div>').join('')+'</div>'+addrUI(x)+schedUI(x)+'<div class="row"><button class="btn s" onclick="saveAct('+x.id+')">Save actuals</button><button class="btn s g" onclick="EDIT=null;render()">Cancel</button></div>'}
  const q=an(x);
- return (q!=null?'<div style="margin-top:3px"><b class="'+(q>=0?'ok':'bad')+'">Actual net '+m$(q)+'</b> <span class="mu">· '+(q-ln(x)>=0?'+':'')+m$(q-ln(x))+' vs estimate</span></div>':'')+addrLine(x)+schedLine(x)+stampUI(x)+'<div style="margin-top:6px"><button class="btn s g" onclick="EDIT='+x.id+';render()">'+(x.act||x.addr||x.sched?'Edit actuals, addresses & times':'Actuals, addresses & times')+'</button> <button class="btn s g" onclick="planTrip('+x.id+',this)">Plan my trip</button></div>'}
+ return (q!=null?'<div style="margin-top:3px"><b class="'+(q>=0?'ok':'bad')+'">Actual net '+m$(q)+'</b> <span class="mu">· '+m$(q/(eff(x).hrs||1))+'/hr · '+(q-ln(x)>=0?'+':'')+m$(q-ln(x))+' vs estimate</span></div>':'')+addrLine(x)+schedLine(x)+stampUI(x)+'<div style="margin-top:6px"><button class="btn s g" onclick="EDIT='+x.id+';render()">'+(x.act||x.addr||x.sched?'Edit actuals, addresses & times':'Actuals, addresses & times')+'</button> <button class="btn s g" onclick="planTrip('+x.id+',this)">Plan my trip</button></div>'}
 function saveAct(id){const x=LOG.find(l=>l.id===id);if(!x)return;const g=i=>{const v=$(i).value;return v===''?null:n(v)};const a={paid:g('eP'),loaded:g('eL'),dh:g('eD'),fuel:g('eF'),drive:g('eV'),wait:g('eW')};Object.keys(a).forEach(k=>{if(a[k]===null)delete a[k]});if(Object.keys(a).length)x.act=a;else delete x.act;{const ad={pa:$('eA').value.trim(),pz:$('eB').value.trim(),da:$('eC').value.trim(),dz:$('eE').value.trim()};if(Object.values(ad).some(v=>v))x.addr=ad;else delete x.addr}{const sc={pd:$('sPD').value,pt:$('sPT').value,dd:$('sDD').value,dt:$('sDT').value};if(Object.values(sc).some(v=>v))x.sched=sc;else delete x.sched;if(sc.pd){const q=sc.pd.split('-').map(Number);x.t=new Date(q[0],q[1]-1,q[2],12,0,0).getTime()}}EDIT=null;save();render()}
 function renderExtra(){renderLinks();$('fixedNote').textContent='Fixed costs: '+m$(fixedWk())+'/week ('+m$((S.ins||0)*12/52)+' insurance'+(S.insCo?', '+S.insCo:'')+' + '+m$(S.fixed||0)+' other)';
  SC.forEach(s=>{const e=$('sf'+s.id);if(e){const mi=s.runs*(s.miles+(s.dh||0)),g=mi/S.mpg;e.textContent=m0(g*S.fuel)+' ('+Math.round(g)+' gal) · '+fmtHM(mi/S.mph)+' driving'}});
@@ -356,13 +358,18 @@ function delSc(id){SC=SC.filter(x=>x.id!==id);save();render()}
 function upSc(id,k,v){const s=SC.find(x=>x.id===id);if(s){s[k]=n(v);save();window.keepSc=true;render();window.keepSc=false}}
 
  
+function csvData(){
+ const hd=['date','lane_note','total_miles','loaded_miles','deadhead_miles','rate_per_mile','gross','cash_costs','fuel_cost','clock_hours','net','actual_paid','actual_loaded_mi','actual_deadhead_mi','actual_fuel','actual_drive_hrs','actual_wait_min','actual_net','pickup_stamp_time','pickup_stamp_lat','pickup_stamp_lon','dropoff_stamp_time','dropoff_stamp_lat','dropoff_stamp_lon','pickup_address','pickup_zip','dropoff_address','dropoff_zip','pickup_date','pickup_time','dropoff_date','dropoff_time'];
+ const rows=[...LOG].sort((a,b)=>a.t-b.t).map(x=>[new Date(x.t).toLocaleDateString('en-CA'),x.note||'',x.miles,x.loaded??x.miles,x.dh||0,x.rate,x.gross.toFixed(2),x.cash.toFixed(2),fuelOf(x).toFixed(2),x.hrs.toFixed(2),ln(x).toFixed(2),...(x.act?[x.act.paid??'',x.act.loaded??'',x.act.dh??'',x.act.fuel??'',x.act.drive??'',x.act.wait??'',an(x).toFixed(2)]:['','','','','','','']),...[x.pu,x.dof].flatMap(s=>s?[new Date(s.t).toISOString(),s.la,s.lo]:['','','']),...['pa','pz','da','dz'].map(k=>(x.addr||{})[k]||''),...['pd','pt','dd','dt'].map(k=>(x.sched||{})[k]||'')]);
+ return [hd].concat(rows)}
+function csvText(){const q=v=>{v=String(v);return /[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};return csvData().map(r=>r.map(q).join(',')).join('\r\n')}
 function copyCsv(){
- const rows=[['date','type','lane_note','total_miles','loaded_miles','deadhead_miles','rate_per_mile','gross','cash_costs','fuel_cost','clock_hours','net','actual_paid','actual_loaded_mi','actual_deadhead_mi','actual_fuel','actual_drive_hrs','actual_wait_min','actual_net','pickup_time','pickup_lat','pickup_lon','dropoff_time','dropoff_lat','dropoff_lon','pickup_address','pickup_zip','dropoff_address','dropoff_zip','pickup_date','pickup_time','dropoff_date','dropoff_time']].concat(LOG.map(x=>[new Date(x.t).toLocaleDateString('en-CA'),(x.type||''),'"'+(x.note||'').replace(/"/g,'""')+'"',x.miles,x.loaded??x.miles,x.dh||0,x.rate,x.gross.toFixed(2),x.cash.toFixed(2),fuelOf(x).toFixed(2),x.hrs.toFixed(2),ln(x).toFixed(2),...(x.act?[x.act.paid??'',x.act.loaded??'',x.act.dh??'',x.act.fuel??'',x.act.drive??'',x.act.wait??'',an(x).toFixed(2)]:['','','','','','','']),...[x.pu,x.dof].flatMap(s=>s?[new Date(s.t).toISOString(),s.la,s.lo]:['','','']),...['pa','pz','da','dz'].map(k=>'"'+String((x.addr||{})[k]||'').replace(/"/g,'""')+'"'),...['pd','pt','dd','dt'].map(k=>(x.sched||{})[k]||'')]));
- const txt=rows.map(r=>r.join(',')).join('\n');
- const done=()=>{$('csvBtn').textContent='Copied!';setTimeout(()=>$('csvBtn').textContent='Copy CSV',1500)};
+ const txt=csvData().map(r=>r.map(v=>String(v).replace(/[\t\r\n]+/g,' ')).join('\t')).join('\n');
+ const done=()=>{$('csvBtn').textContent='Copied! Paste into Sheets';setTimeout(()=>$('csvBtn').textContent='Copy for Sheets',2200)};
  try{navigator.clipboard.writeText(txt).then(done,()=>fb())}catch(e){fb()}
  function fb(){const t=document.createElement('textarea');t.value=txt;document.body.appendChild(t);t.select();try{document.execCommand('copy');done()}catch(e){}t.remove()}
 }
+function dlCsv(){const b=new Blob(['\ufeff'+csvText()],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='hotshots-trips.csv';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
 
 ['netGoal','fuel','mpg','wear','mph','mileRate','incTax','fixed','ins'].forEach(k=>{
  $(k).value=S[k];$(k).addEventListener('input',e=>{S[k]=n(e.target.value);save();render()})});
