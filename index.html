@@ -120,7 +120,7 @@ summary{cursor:pointer;font-weight:600;font-size:.9rem}
   </div>
   <div class="f" style="margin-top:10px"><label style="display:flex;gap:8px;align-items:center;text-transform:none;letter-spacing:0;font-size:.85rem;color:var(--tx)"><input type="checkbox" id="geo" style="width:auto"> Use location to stamp pickup and drop-off</label><div class="mu">Off by default. When on, tapping a stamp saves only a rough spot (about a 7-mile grid) and the time. It stays on this device.</div></div>
   <div class="mu" id="fixedNote" style="margin-bottom:6px"></div>
-  <div class="mu">Taxes use only the IRS mileage rate as the deduction (no fuel/wear deduction on top). Fuel and wear still count as real cash out for take-home. SE tax (15.3% on 92.35% of profit) is included and is separate from, and in addition to, federal income tax.</div>
+  <div class="mu">The IRS business rate was 72.5¢/mi through June 30, 2026 and is 76¢/mi from July 1, 2026. Taxes use only the IRS mileage rate as the deduction (no fuel/wear deduction on top). Fuel and wear still count as real cash out for take-home. SE tax (15.3% on 92.35% of profit) is included and is separate from, and in addition to, federal income tax.</div>
  </details>
 </div>
 
@@ -197,13 +197,14 @@ summary{cursor:pointer;font-weight:600;font-size:.9rem}
 <script>
 const $=id=>document.getElementById(id);
 const PRE={local:{dead:.03,extra:2},regional:{dead:.03,extra:3},otr:{dead:.02,extra:4}};
-let S={tripPrefs:'Cargo van, too tall for most drive-thrus.',ins:0,aDh:0,cash:0,netGoal:2000,fuel:6.49,mpg:21,wear:.15,mph:62,mileRate:.725,incTax:12,fixed:0,type:'local',dead:.03,extra:1,aMiles:500,aRate:1.5,aFlat:750};
+let S={tripPrefs:'Cargo van, too tall for most drive-thrus.',ins:0,aDh:0,cash:0,netGoal:2000,fuel:6.49,mpg:21,wear:.15,mph:62,mileRate:.76,incTax:12,fixed:0,type:'local',dead:.03,extra:1,aMiles:500,aRate:1.5,aFlat:750};
 let LOG=[],SC=[],LINKS=[{n:'Recreation.gov',u:'https://www.recreation.gov'},{n:'The Dyrt',u:'https://thedyrt.com'},{n:'DAT Load Board',u:'https://www.dat.com'}];
 try{const d=JSON.parse(localStorage.getItem('fpe1')||'null');if(d){S=Object.assign(S,d.S);LOG=d.LOG||[];SC=d.SC||[];LINKS=d.LINKS||LINKS}}catch(e){}
 const save=()=>{try{localStorage.setItem('fpe1',JSON.stringify({S,LOG,SC,LINKS}))}catch(e){}};
 if(!S.hmAdded){LINKS.push({n:'Hivemapper',u:'https://hivemapper.com'});S.hmAdded=1;save()}
 if(!S.defV2){if(S.fuel===3.85&&S.mpg===9){S.fuel=6.49;S.mpg=21}S.defV2=1;save()}
 if(!S.waitV2){S.extra=1;S.waitV2=1;save()}
+if(!S.irsV3){if(S.mileRate===0.725)S.mileRate=0.76;S.irsV3=1;save()}
 if(!S.datV){const i=LINKS.findIndex(l=>/booking\.com/i.test(l.u));if(i>-1)LINKS[i]={n:'DAT Load Board',u:'https://www.dat.com'};S.datV=1;save()}
 const m$=n=>(n<0?'-':'')+'$'+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
 const m0=n=>(n<0?'-':'')+'$'+Math.abs(Math.round(n)).toLocaleString();
