@@ -56,6 +56,8 @@ summary{cursor:pointer;font-weight:600;font-size:.9rem}
 :root[data-theme="day"] .btn{background:linear-gradient(90deg,#0b3a8c,#0b5fd6);border-color:#0b3a8c;box-shadow:0 2px 8px rgba(6,18,42,.3)}
 :root[data-theme="day"] .btn.g{background:transparent;color:#2c4468;border-color:#2c4468;box-shadow:none}
 :root[data-theme="day"] .seg button.on{background:#0b3a8c}
+input[type=date],input[type=time]{color-scheme:dark}:root[data-theme="day"] input[type=date],:root[data-theme="day"] input[type=time]{color-scheme:light}
+.dsel{width:auto;padding:4px 6px;font-size:.9rem;border-radius:8px;display:inline-block;font-weight:500}
 @media (prefers-reduced-motion:reduce){.beam,.pgl,.eyes,.bub{animation:none}}
 </style></head><body><div class="wrap">
 
@@ -210,13 +212,14 @@ const m$=n=>(n<0?'-':'')+'$'+Math.abs(n).toLocaleString(undefined,{minimumFracti
 const m0=n=>(n<0?'-':'')+'$'+Math.abs(Math.round(n)).toLocaleString();
 const n=v=>parseFloat(v)||0;
 const weekStart=()=>{const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7));return d.getTime()};
+const weekEnd=()=>{const d=new Date(weekStart());d.setDate(d.getDate()+7);return d.getTime()};
 
 function costs(mi){const fuel=mi/S.mpg*S.fuel,wear=mi*S.wear;return{fuel,wear,cash:fuel+wear}}
 function taxes(gross,mi){const t=Math.max(0,gross-mi*S.mileRate),se=t*.9235*.153,inc=Math.max(0,t-se/2)*S.incTax/100;return{taxable:t,se,inc,total:se+inc}}
 function week(L){let g=0,mi=0,c=0,h=0;L.forEach(x=>{g+=x.gross;mi+=x.miles;c+=x.cash;h+=x.hrs});const t=taxes(g,mi);return{gross:g,miles:mi,cash:c,hrs:h,tax:t.total,net:L.length?g-c-t.total:0}}
 const fixedWk=()=>(S.fixed||0)+(S.ins||0)*12/52;
 const weekNet=L=>{const w=week(L);return w.net-(L.length?fixedWk():0)};
-const acc=()=>LOG.filter(x=>x.t>=weekStart()).map(eff);
+const acc=()=>LOG.filter(x=>x.t>=weekStart()&&x.t<weekEnd()).map(eff);
 const planned=()=>SC.filter(s=>s.runs>0&&s.miles>0).map(s=>{const lm=s.runs*s.miles,mi=lm+s.runs*(s.dh||0);return{miles:mi,gross:lm*s.rate,cash:costs(mi).cash,hrs:s.runs*((s.miles+(s.dh||0))/S.mph+S.extra)}});
 
 function analyze(){
@@ -240,7 +243,7 @@ function render(){
  const A=acc(),w=week(A),wn=weekNet(A),P=planned(),pn=weekNet(A.concat(P)),pw=week(A.concat(P));
  $('heroSub').textContent='WEEK OF '+new Date(weekStart()).toLocaleDateString(undefined,{month:'short',day:'numeric'}).toUpperCase()+'  \u00b7  THE GOAL: '+m0(S.netGoal);
  $('grossGoal').textContent=m0(S.netGoal/avgMargin());
- $('wkLabel').textContent='Week of '+new Date(weekStart()).toLocaleDateString(undefined,{month:'short',day:'numeric'})+' · '+A.length+' accepted load'+(A.length==1?'':'s');
+ $('wkLabel').textContent='Week of '+new Date(weekStart()).toLocaleDateString(undefined,{month:'short',day:'numeric'})+' · '+A.length+' accepted load'+(A.length==1?'':'s')+(()=>{const u=LOG.filter(x=>x.t>=weekEnd()).length;return u?' · '+u+' dated later':''})();
  $('wNet').textContent=m$(wn);$('wNetSub').textContent=fixedWk()?'After '+m0(fixedWk())+' fixed weekly costs (incl. insurance)':'Accepted take-home pay';
  $('wGap').textContent=m$(Math.max(0,S.netGoal-wn));
  $('wGross').textContent=m0(w.gross);$('wMiles').textContent=w.miles.toLocaleString()+' mi';
@@ -260,7 +263,7 @@ function render(){
 }
 function renderLog(){
  const ws=weekStart();
- $('log').innerHTML=LOG.length?[...LOG].reverse().map(x=>`<div class="lrow ${x.t<ws?'old':''}"><div class="row"><b>${new Date(x.t).toLocaleDateString(undefined,{month:'short',day:'numeric'})}${x.note?' · '+esc(x.note):''}</b><button class="x" onclick="delLoad(${x.id})">✕</button></div><div class="mu">${x.loaded??x.miles} loaded + ${x.dh||0} deadhead mi @ ${m$(x.rate)}/mi · Gross ${m$(x.gross)} · Costs ${m$(x.cash)} (fuel ${m$(fuelOf(x))}) · ${fmtHM(x.hrs)} on the clock</div><div style="margin-top:3px"><b class="${ln(x)>=0?'ok':'bad'}">Net ${m$(ln(x))}</b> <span class="mu">· ${m$(ln(x)/(x.hrs||1))}/hr · ${(ln(x)/(x.gross||1)*100).toFixed(0)}% margin</span></div>${rowAct(x)}</div>`).join(''):'<div class="mu" style="padding:14px 0;text-align:center">No loads logged yet.</div>';
+ $('log').innerHTML=LOG.length?[...LOG].sort((a,b)=>b.t-a.t).map(x=>`<div class="lrow ${x.t<ws?'old':''}"><div class="row"><b>${dateSel(x)}${x.note?' · '+esc(x.note):''}</b><button class="x" onclick="delLoad(${x.id})">✕</button></div><div class="mu">${x.loaded??x.miles} loaded + ${x.dh||0} deadhead mi @ ${m$(x.rate)}/mi · Gross ${m$(x.gross)} · Costs ${m$(x.cash)} (fuel ${m$(fuelOf(x))}) · ${fmtHM(x.hrs)} on the clock</div><div style="margin-top:3px"><b class="${ln(x)>=0?'ok':'bad'}">Net ${m$(ln(x))}</b> <span class="mu">· ${m$(ln(x)/(x.hrs||1))}/hr · ${(ln(x)/(x.gross||1)*100).toFixed(0)}% margin</span></div>${rowAct(x)}</div>`).join(''):'<div class="mu" style="padding:14px 0;text-align:center">No loads logged yet.</div>';
  if(!window.keepSc)$('scs').innerHTML=SC.length?SC.map(s=>`<div class="sc"><div class="g3"><div><label>Runs</label><input type="number" value="${s.runs}" oninput="upSc(${s.id},'runs',this.value)"></div><div><label>Miles</label><input type="number" value="${s.miles}" oninput="upSc(${s.id},'miles',this.value)"></div><div><label>Rate $/mi</label><input type="number" step="0.05" value="${s.rate}" oninput="upSc(${s.id},'rate',this.value)"></div></div><div class="f" style="margin-top:8px"><label>Deadhead mi (each run)</label><input type="number" value="${s.dh||0}" oninput="upSc(${s.id},'dh',this.value)"></div><div class="mu" style="margin-top:6px">Est. fuel &amp; drive time: <b id="sf${s.id}"></b></div><button class="x" onclick="delSc(${s.id})">Remove</button></div>`).join(''):'<div class="mu" style="padding:6px 0 12px">No rows yet. Add one to test combinations.</div>';
  renderExtra();
 }
@@ -277,19 +280,30 @@ function micMiles(){const SR=window.SpeechRecognition||window.webkitSpeechRecogn
 function applyTheme(){document.documentElement.setAttribute('data-theme',S.theme==='day'?'day':'night');$('themeBtn').textContent=S.theme==='day'?'🌙 Night mode':'☀ Day mode'}
 function toggleTheme(){S.theme=S.theme==='day'?'night':'day';save();applyTheme()}
 const fuelOf=x=>x.act&&x.act.fuel!=null?x.act.fuel:(x.fuel!=null?x.fuel:x.cash*(S.fuel/S.mpg)/((S.fuel/S.mpg)+S.wear));
-function planTrip(id,btn){const x=LOG.find(l=>l.id===id);if(!x)return;const lm=x.loaded??x.miles,dh=x.dh||0,tot=lm+dh,drv=tot/S.mph,d=x.addr||{};
+function planTrip(id,btn){const x=LOG.find(l=>l.id===id);if(!x)return;const lm=x.loaded??x.miles,dh=x.dh||0,tot=lm+dh,drv=tot/S.mph,d=x.addr||{},sc=x.sched||{};
  const pu=[d.pa,d.pz].filter(Boolean).join(' '),dr=[d.da,d.dz].filter(Boolean).join(' ');
  const t=new Date().toLocaleString(undefined,{weekday:'long',hour:'numeric',minute:'2-digit'});
  const txt=['I drive a cargo van for freight (hotshot / last mile) and I just booked a load. Please help me plan the trip.','',
  'Load: '+lm+' loaded miles'+(dh?' plus '+dh+' miles to the pickup':'')+' ('+tot+' miles total, roughly '+fmtHM(drv)+' of driving at about '+S.mph+' mph).',
- x.note?'Lane / note: '+x.note:null,pu?'Pickup: '+pu:null,dr?'Drop-off: '+dr:null,
+ x.note?'Lane / note: '+x.note:null,(pu||sc.pd||sc.pt)?'Pickup: '+[pu,sc.pd?fmtD(sc.pd):'',sc.pt?fmtT(sc.pt):''].filter(Boolean).join(', '):null,(dr||sc.dd||sc.dt)?'Drop-off: '+[dr,sc.dd?fmtD(sc.dd):'',sc.dt?fmtT(sc.dt):''].filter(Boolean).join(', '):null,
  'Loading, unloading and waiting: about '+Math.round(Math.max(0,x.hrs-x.miles/S.mph)*60)+' minutes in total.',
- 'It is currently '+t+' my time.',
+ 'Trip date: '+new Date(x.t).toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'})+'.','It is currently '+t+' my time.',
  S.tripPrefs?'About me and my vehicle: '+S.tripPrefs:null,'',
  'First, ask me how many hours I plan to drive on the first leg and whether I want food or rest. Then suggest good places to stop (food, fuel, rest) along the way that will be open when I get there and are easy to get a van into. Mention traffic or road issues if you can, and tell me when you are unsure so I can double-check hours and conditions. Keep it short and friendly.'].filter(v=>v!==null).join('\n');
  const done=()=>{const o=btn.textContent;btn.textContent='Copied! Paste into your AI chat app';setTimeout(()=>btn.textContent=o,2800)};
  const fb=()=>{window.prompt('Copy this and paste it into your AI chat app:',txt)};
  try{navigator.clipboard.writeText(txt).then(done,fb)}catch(er){fb()}}
+const fmtD=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})};
+const fmtT=s=>{const [h,m]=s.split(':').map(Number);return new Date(2000,0,1,h,m).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})};
+function schedUI(x){const s=x.sched||{};const f=(i,l,t,v)=>'<div class="f"><label>'+l+' (optional)</label><input type="'+t+'" id="'+i+'" value="'+esc(v||'')+'"></div>';
+ return '<div class="g2">'+f('sPD','Pickup date','date',s.pd)+f('sPT','Pickup time','time',s.pt)+f('sDD','Drop-off date','date',s.dd)+f('sDT','Drop-off time','time',s.dt)+'</div>'}
+function schedLine(x){const s=x.sched;if(!s)return '';const a=[[s.pd?fmtD(s.pd):'',s.pt?fmtT(s.pt):''].filter(Boolean).join(' '),[s.dd?fmtD(s.dd):'',s.dt?fmtT(s.dt):''].filter(Boolean).join(' ')];if(!a[0]&&!a[1])return '';return '<div class="mu" style="margin-top:4px">'+(a[0]?'Pickup '+esc(a[0]):'')+(a[0]&&a[1]?' \u2192 ':'')+(a[1]?'Drop-off '+esc(a[1]):'')+'</div>'}
+function dayKey(t){const d=new Date(t);return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate()}
+function dateSel(x){const base=new Date();base.setHours(12,0,0,0);const o=[],cur=dayKey(x.t);let found=false;
+ for(let i=-7;i<=14;i++){const d=new Date(base);d.setDate(base.getDate()+i);const s=dayKey(d.getTime())===cur;if(s)found=true;o.push('<option value="'+d.getTime()+'"'+(s?' selected':'')+'>'+d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})+(i===0?' (today)':'')+'</option>')}
+ if(!found)o.unshift('<option value="'+x.t+'" selected>'+new Date(x.t).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})+'</option>');
+ return '<select class="dsel" onchange="setDate('+x.id+',this.value)">'+o.join('')+'</select>'}
+function setDate(id,v){const x=LOG.find(l=>l.id===id);if(x){x.t=+v;save();render()}}
 function goEval(){const e=$('aMiles');e.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>{e.focus();e.select()},400)}
 function fmtHM(hh){const m=Math.round(hh*60);return Math.floor(m/60)+'h '+(m%60)+'m'}
 const FEEDBACK_URL='https://docs.google.com/forms/d/e/1FAIpQLSdNw0ja1UXYpHfrF2PwuDgxJBvb57zskZt1_Snve3DJHcFuzg/viewform';
@@ -311,10 +325,10 @@ function stamp(id,i){const x=LOG.find(l=>l.id===id);if(!x)return;if(!navigator.g
  navigator.geolocation.getCurrentPosition(p=>{x[K[i]]={t:Date.now(),la:Math.round(p.coords.latitude*10)/10,lo:Math.round(p.coords.longitude*10)/10};save();render()},()=>alert('Could not get your location. Make sure location is allowed for this site.'),{enableHighAccuracy:false,timeout:15000,maximumAge:60000})}
 function clearStamp(id,i){const x=LOG.find(l=>l.id===id);if(x){delete x[K[i]];save();render()}}
 function rowAct(x){
- if(EDIT===x.id){const a=x.act||{};return '<div class="g2" style="margin-top:8px">'+[['eP','Actual paid $',a.paid],['eL','Actual loaded mi',a.loaded],['eD','Actual deadhead mi',a.dh],['eF','Actual fuel $',a.fuel],['eV','Actual drive time (hrs)',a.drive],['eW','Actual wait time (min)',a.wait]].map(([i,l,v])=>'<div class="f"><label>'+l+'</label><input type="number" id="'+i+'" inputmode="decimal" placeholder="blank = estimate" value="'+(v!=null?v:'')+'"></div>').join('')+'</div>'+addrUI(x)+'<div class="row"><button class="btn s" onclick="saveAct('+x.id+')">Save actuals</button><button class="btn s g" onclick="EDIT=null;render()">Cancel</button></div>'}
+ if(EDIT===x.id){const a=x.act||{};return '<div class="g2" style="margin-top:8px">'+[['eP','Actual paid $',a.paid],['eL','Actual loaded mi',a.loaded],['eD','Actual deadhead mi',a.dh],['eF','Actual fuel $',a.fuel],['eV','Actual drive time (hrs)',a.drive],['eW','Actual wait time (min)',a.wait]].map(([i,l,v])=>'<div class="f"><label>'+l+'</label><input type="number" id="'+i+'" inputmode="decimal" placeholder="blank = estimate" value="'+(v!=null?v:'')+'"></div>').join('')+'</div>'+addrUI(x)+schedUI(x)+'<div class="row"><button class="btn s" onclick="saveAct('+x.id+')">Save actuals</button><button class="btn s g" onclick="EDIT=null;render()">Cancel</button></div>'}
  const q=an(x);
- return (q!=null?'<div style="margin-top:3px"><b class="'+(q>=0?'ok':'bad')+'">Actual net '+m$(q)+'</b> <span class="mu">· '+(q-ln(x)>=0?'+':'')+m$(q-ln(x))+' vs estimate</span></div>':'')+addrLine(x)+stampUI(x)+'<div style="margin-top:6px"><button class="btn s g" onclick="EDIT='+x.id+';render()">'+(x.act||x.addr?'Edit actuals & addresses':'Actuals & addresses')+'</button> <button class="btn s g" onclick="planTrip('+x.id+',this)">Plan my trip</button></div>'}
-function saveAct(id){const x=LOG.find(l=>l.id===id);if(!x)return;const g=i=>{const v=$(i).value;return v===''?null:n(v)};const a={paid:g('eP'),loaded:g('eL'),dh:g('eD'),fuel:g('eF'),drive:g('eV'),wait:g('eW')};Object.keys(a).forEach(k=>{if(a[k]===null)delete a[k]});if(Object.keys(a).length)x.act=a;else delete x.act;{const ad={pa:$('eA').value.trim(),pz:$('eB').value.trim(),da:$('eC').value.trim(),dz:$('eE').value.trim()};if(Object.values(ad).some(v=>v))x.addr=ad;else delete x.addr}EDIT=null;save();render()}
+ return (q!=null?'<div style="margin-top:3px"><b class="'+(q>=0?'ok':'bad')+'">Actual net '+m$(q)+'</b> <span class="mu">· '+(q-ln(x)>=0?'+':'')+m$(q-ln(x))+' vs estimate</span></div>':'')+addrLine(x)+schedLine(x)+stampUI(x)+'<div style="margin-top:6px"><button class="btn s g" onclick="EDIT='+x.id+';render()">'+(x.act||x.addr||x.sched?'Edit actuals, addresses & times':'Actuals, addresses & times')+'</button> <button class="btn s g" onclick="planTrip('+x.id+',this)">Plan my trip</button></div>'}
+function saveAct(id){const x=LOG.find(l=>l.id===id);if(!x)return;const g=i=>{const v=$(i).value;return v===''?null:n(v)};const a={paid:g('eP'),loaded:g('eL'),dh:g('eD'),fuel:g('eF'),drive:g('eV'),wait:g('eW')};Object.keys(a).forEach(k=>{if(a[k]===null)delete a[k]});if(Object.keys(a).length)x.act=a;else delete x.act;{const ad={pa:$('eA').value.trim(),pz:$('eB').value.trim(),da:$('eC').value.trim(),dz:$('eE').value.trim()};if(Object.values(ad).some(v=>v))x.addr=ad;else delete x.addr}{const sc={pd:$('sPD').value,pt:$('sPT').value,dd:$('sDD').value,dt:$('sDT').value};if(Object.values(sc).some(v=>v))x.sched=sc;else delete x.sched;if(sc.pd){const q=sc.pd.split('-').map(Number);x.t=new Date(q[0],q[1]-1,q[2],12,0,0).getTime()}}EDIT=null;save();render()}
 function renderExtra(){renderLinks();$('fixedNote').textContent='Fixed costs: '+m$(fixedWk())+'/week ('+m$((S.ins||0)*12/52)+' insurance'+(S.insCo?', '+S.insCo:'')+' + '+m$(S.fixed||0)+' other)';
  SC.forEach(s=>{const e=$('sf'+s.id);if(e){const mi=s.runs*(s.miles+(s.dh||0)),g=mi/S.mpg;e.textContent=m0(g*S.fuel)+' ('+Math.round(g)+' gal) · '+fmtHM(mi/S.mph)+' driving'}});
  const PP=planned(),pm=PP.reduce((t,x)=>t+x.miles,0);$('pTot').textContent=pm?'Planned runs: '+m0(pm/S.mpg*S.fuel)+' fuel · '+fmtHM(pm/S.mph)+' driving':'';
@@ -343,7 +357,7 @@ function upSc(id,k,v){const s=SC.find(x=>x.id===id);if(s){s[k]=n(v);save();windo
 
  
 function copyCsv(){
- const rows=[['date','type','lane_note','total_miles','loaded_miles','deadhead_miles','rate_per_mile','gross','cash_costs','fuel_cost','clock_hours','net','actual_paid','actual_loaded_mi','actual_deadhead_mi','actual_fuel','actual_drive_hrs','actual_wait_min','actual_net','pickup_time','pickup_lat','pickup_lon','dropoff_time','dropoff_lat','dropoff_lon','pickup_address','pickup_zip','dropoff_address','dropoff_zip']].concat(LOG.map(x=>[new Date(x.t).toISOString().slice(0,10),(x.type||''),'"'+(x.note||'').replace(/"/g,'""')+'"',x.miles,x.loaded??x.miles,x.dh||0,x.rate,x.gross.toFixed(2),x.cash.toFixed(2),fuelOf(x).toFixed(2),x.hrs.toFixed(2),ln(x).toFixed(2),...(x.act?[x.act.paid??'',x.act.loaded??'',x.act.dh??'',x.act.fuel??'',x.act.drive??'',x.act.wait??'',an(x).toFixed(2)]:['','','','','','','']),...[x.pu,x.dof].flatMap(s=>s?[new Date(s.t).toISOString(),s.la,s.lo]:['','','']),...['pa','pz','da','dz'].map(k=>'"'+String((x.addr||{})[k]||'').replace(/"/g,'""')+'"')]));
+ const rows=[['date','type','lane_note','total_miles','loaded_miles','deadhead_miles','rate_per_mile','gross','cash_costs','fuel_cost','clock_hours','net','actual_paid','actual_loaded_mi','actual_deadhead_mi','actual_fuel','actual_drive_hrs','actual_wait_min','actual_net','pickup_time','pickup_lat','pickup_lon','dropoff_time','dropoff_lat','dropoff_lon','pickup_address','pickup_zip','dropoff_address','dropoff_zip','pickup_date','pickup_time','dropoff_date','dropoff_time']].concat(LOG.map(x=>[new Date(x.t).toLocaleDateString('en-CA'),(x.type||''),'"'+(x.note||'').replace(/"/g,'""')+'"',x.miles,x.loaded??x.miles,x.dh||0,x.rate,x.gross.toFixed(2),x.cash.toFixed(2),fuelOf(x).toFixed(2),x.hrs.toFixed(2),ln(x).toFixed(2),...(x.act?[x.act.paid??'',x.act.loaded??'',x.act.dh??'',x.act.fuel??'',x.act.drive??'',x.act.wait??'',an(x).toFixed(2)]:['','','','','','','']),...[x.pu,x.dof].flatMap(s=>s?[new Date(s.t).toISOString(),s.la,s.lo]:['','','']),...['pa','pz','da','dz'].map(k=>'"'+String((x.addr||{})[k]||'').replace(/"/g,'""')+'"'),...['pd','pt','dd','dt'].map(k=>(x.sched||{})[k]||'')]));
  const txt=rows.map(r=>r.join(',')).join('\n');
  const done=()=>{$('csvBtn').textContent='Copied!';setTimeout(()=>$('csvBtn').textContent='Copy CSV',1500)};
  try{navigator.clipboard.writeText(txt).then(done,()=>fb())}catch(e){fb()}
